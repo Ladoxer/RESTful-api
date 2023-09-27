@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const checkAuth = require('../middleware/check-auth');
 
 const Order = require('../models/order');
 const Product = require('../models/product');
 
-router.get('/',async(req, res, next) => {
+router.get('/', checkAuth,async(req, res, next) => {
   try {
     const docs = await Order.find().select('product quantity _id').populate('product','name');
     res.status(200).json({
@@ -30,7 +31,7 @@ router.get('/',async(req, res, next) => {
   }
 });
 
-router.post('/',async(req, res, next) => {
+router.post('/',checkAuth,async(req, res, next) => {
   try {
     const product = await Product.findById(req.body.productId);
     if(product){
@@ -66,7 +67,7 @@ router.post('/',async(req, res, next) => {
   }
 });
 
-router.get('/:orderId',async (req, res, next) => {
+router.get('/:orderId',checkAuth,async (req, res, next) => {
   try {
     const order = await Order.findById({_id:req.params.orderId}).select('product quantity _id').populate('product','name price');
     console.log(order);
@@ -90,7 +91,7 @@ router.get('/:orderId',async (req, res, next) => {
   }
 });
 
-router.delete('/:orderId',async (req, res, next) => {
+router.delete('/:orderId',checkAuth,async (req, res, next) => {
   try {
     const result = await Order.deleteOne({_id:req.params.orderId});
     res.status(200).json({
